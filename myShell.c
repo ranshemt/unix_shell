@@ -6,32 +6,55 @@ void shellLoop(char **history, int *pids)
 {
     char *line;     //allocated in readLine
     char **args;    //allocated in splitLine
-    int status, hisSize;
+    int status, hisSize, sTmp;
     hisSize = argsCount(history);
     do
     {
         printf("> ");
+        //
         //read line
         line = readLine();
+        if(line == NULL){
+            fprintf(stderr, "no line input!\n");
+            continue;
+        }
+        //
         //save line in history
-        history[hisSize] = (char*)malloc(sizeof(char)*(strlen(line)+1));
-        if(history[hisSize == NULL]){
+        sTmp = argsCount(history);
+        history[sTmp] = (char*)malloc(sizeof(char)*(strlen(line)+1));
+        if(history[sTmp] == NULL){
             perror("malloc err in shellLoop()");
             fprintf(stderr, "malloc err for history. %s won't be saved\n", line);
+            if(line != NULL) free(line);
+            continue;
         }
-        strcpy(history, line);
+        strcpy(history[sTmp], line);
+        history[sTmp + 1] = NULL;
         //
         //split line into args
         args = splitLine(line);
+        if(args == NULL){
+            fprintf(stderr, "couldn't splitLine\n");
+            free(line);
+            continue;
+        }
             //printf("> calling runCommand with args: \n");
             //printArgs(args);
+        //
         //run the command
         status = runCommand(args, pids);
+        if(status == -1){
+            fprintf(stderr, "certainy wrong input: %s", line);
+        }
+        if(status == 0){
+            fprintf(stderr, "runCommand() received no args\n");
+        }
+        //
         //free memory
         if(line != NULL)    free(line);
         if(args != NULL){
             while(*args != NULL) free(*args++);
-            free(args);  
+            free(args);
         }
         free(line);
     } while (status);
@@ -40,17 +63,21 @@ void shellLoop(char **history, int *pids)
 //run relevant command function
 int runCommand(char **args, int *pids)
 {
-    int i, r = -1;
+    int i, r = 1;
 
     if (args[0] == NULL)
     {
         // An empty command was entered.
-        return 1;
+        return 0;
     }
     //
     //activate relevant command
     for (i = 0; i < commsNum(); i++)
     {
+        //certain it's wrong command
+        if(strcmp(args[0], "err") == 0){
+            return -1;
+        }
         //all commands
         if (strcmp(args[0], commsCodes[i]) == 0){
             r = (*commsFuncs[i])(args, pids);
@@ -103,6 +130,7 @@ int appLaunch(char **args, int *pids)
             argv[i-1] = (char*)malloc(sizeof(char)*(lenT+1));
             if(argv[i-1] == NULL){
                 perror("malloc err in appLaunch()");
+                return 0;
             }
             strcpy(argv[i-1], args[i]);
         }
@@ -116,6 +144,7 @@ int appLaunch(char **args, int *pids)
             argv[i-1] = (char*)malloc(sizeof(char)*(lenT+1));
             if(argv[i-1] == NULL){
                 perror("malloc err in appLaunch()");
+                return 0;
             }
             strcpy(argv[i-1], args[i]);
         }
@@ -124,6 +153,7 @@ int appLaunch(char **args, int *pids)
         newOut = (char*)malloc(sizeof(char) * (lenT + 1));
         if(newOut == NULL){
             perror("malloc err in appLaunch()");
+            return 0;
         }
         strcpy(newOut, args[argsCount(args) - 1]);
     }
@@ -139,6 +169,7 @@ int appLaunch(char **args, int *pids)
         if (execv(args[1], argv) == -1)
         {
             perror("> >execv in appLaunch()");
+            return 0;
         }
         exit(EXIT_FAILURE);
     }
@@ -146,6 +177,7 @@ int appLaunch(char **args, int *pids)
     {
         // Error forking
         perror("> >fork in appLaunch()");
+        return 0;
     }
     else
     {
@@ -164,7 +196,7 @@ int appLaunch(char **args, int *pids)
     }
     if(argv != NULL){
         while(*argv != NULL) free(*argv++);
-        free(argv);   
+        free(argv);
     }
     if(newOut != NULL) free(newOut);
     return 1;

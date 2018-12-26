@@ -35,19 +35,36 @@ char *readLine(void)
     return line;
 }
 //
-//
+//splitLine()
 char **splitLine(char *line)
 {
-	int position = 0;
+	int position = 0, isEqueal = 0;
 	char **tokens = (char**)malloc(tknsNum * sizeof(char *));
-	char *token;
-
+	char *token, *lineCpy;
+	lineCpy = (char *)malloc(sizeof(char) * (strlen(line) + 1));
+	if(lineCpy == NULL){
+		perror("malloc err in splitLine()");
+		return NULL;
+	}
+	strcpy(lineCpy, line);
 	if (!tokens)
 	{
 		fprintf(stderr, "splitLine: malloc error\n");
 		return NULL;
 	}
-
+	//
+	//key=value
+	while(*lineCpy != '\0'){
+		// if(strcmp(*lineCpy, " ") == 0){
+		// 	break;
+		// }
+		if(*lineCpy == '='){
+			isEqueal = 1;
+		}
+		lineCpy++;
+	}
+	//
+	//split line
 	token = strtok(line, tokDelim);
 	while (token != NULL)
 	{
@@ -59,17 +76,18 @@ char **splitLine(char *line)
 			fprintf(stderr, "too many words in line: %s\n", line);
 			break;
 		}
-
 		token = strtok(NULL, tokDelim);
 	}
     //terminate
 	tokens[position] = NULL;
+	//
 	//simple commands
 	if (strcmp(tokens[0], "myMan") == 0 || strcmp(tokens[0], "tasks") == 0 || strcmp(tokens[0], "return") == 0 || strcmp(tokens[0], "print_env") == 0 || strcmp(tokens[0], "show_history") == 0 || strcmp(tokens[0], "exit") == 0) {
 		return tokens;
 	}
+	//
 	//key=value
-	if (argsCount(tokens) == 2 && isCaps(tokens[0]) && isCaps(tokens[1])) {
+	if (argsCount(tokens) == 2 && isEqueal == 1) {
 		//push
         tokens[2] = tokens[1];
 		tokens[1] = tokens[0];
@@ -86,6 +104,7 @@ char **splitLine(char *line)
 		return tokens;
 	}
 	int isAmper = 0, isOutput = 0, i;
+	//
 	//&
 	if (argsCount(tokens) >= 2 && strcmp(tokens[argsCount(tokens) - 1], "&") == 0) {
 		isAmper = 1;
@@ -104,6 +123,7 @@ char **splitLine(char *line)
 		return tokens;
 	}
 	int tmp;
+	//
 	//>
 	if (argsCount(tokens) >= 3 && strcmp(tokens[argsCount(tokens) - 2], ">") == 0) {
 		isOutput = 1;
@@ -122,6 +142,7 @@ char **splitLine(char *line)
 		strcpy(tokens[0], ">");
 		return tokens;
 	}
+	//
 	//l
 	if (isAmper == 0 && isOutput == 0) {
 		//push "l" at the beginning of tokens
@@ -158,7 +179,7 @@ void printArgs(char **args){
 int arrSize(int *a){
     int n = 0;
     if(a == NULL)   return n;
-    while(*a != NULL){
+    while(*a != '\0'){
         n++;
         a++;
     }
