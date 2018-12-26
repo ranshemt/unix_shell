@@ -52,11 +52,28 @@ void shellLoop()
         //
         //free memory
         if(line != NULL)    free(line);
-        sTmp = argsCount(args);
-        for( i= 0; i < sTmp; i++){
-            if(args[i] != NULL) free(args[i]);
+        if(args == NULL){
+            continue;
         }
-        if(args != NULL) free(args);
+        printf("args adr: %p\n", args);
+        printf("ARGS:\n");
+        printArgs(args);
+        printf("'n");
+        sTmp = argsCount(args);
+        printf("size: %d\n", sTmp);
+        for(i = 0; i < sTmp; i++){
+            printf("i = %d\n", i);
+            if(args != NULL && args[i] != NULL){
+                printf("args adr: %p   .   arg[i] adr: %p\n", args, args[i]);
+                free(args[i]);
+            }
+        }
+        printf("finished for\n");
+        if(args != NULL){
+            printf("freeing args adr = %p\n", args);
+            free(args);
+        }
+        printf("freed!\n");
     } while (status);
 }
 //

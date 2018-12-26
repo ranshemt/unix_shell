@@ -117,17 +117,17 @@ int launchContinue(char **args){
 }
 int tasks(char **args){
     if(sizePids == 0){
-        return -1;
+        printf("> SUCCESS: no apps in background\n");
+        return 0;
     }
-    char *fPath = NULL, **argsTmp;
+    char **argsTmp;
     int currPid = -1, i, len;
 
     for(i = 0; i < sizePids; i++){
         currPid = myPids[i];
-        argsTmp = splitLine(history[i]);
+        argsTmp = splitLine(history[pidsStrHistory[i]]);
         //print
         printf("> %s:%d\n", argsTmp[1], currPid);
-        fPath = NULL;
         currPid = -1;
     }
     //free argsTmp
@@ -139,7 +139,51 @@ int tasks(char **args){
     return 1;
 }
 int return_pid(char **args){
-
+    if(args[1] == NULL){
+        fprintf(stderr, "no pid for command return\n");
+        return 0;
+    }
+    char *tmpS;
+    int len = strlen(args[1]);
+    tmpS = (char*) malloc(sizeof(char) * (len+1));
+    //check
+    strcpy(tmpS, args[1]);
+    int currPid = atoi(tmpS);
+    if(currPid == 0){
+        printf("> ERR: no valid pid for args[1] = %s\n", args[1]);
+        return 0;
+    }
+    int i, flag = 0, killRes, pidI;
+    for(i = 0; i < sizePids; i++){
+        if(myPids[i] == currPid){
+            killRes = kill(myPids[i], 0);
+            if(killRes == -1){
+                perror("kill in return_pid");
+                return 0;
+            }
+            flag = 1;
+            pidI = i;
+            break;
+        }
+    }
+    if(flag == 0){
+        printf("> ERR: requested pid = %d wasn't found\n", currPid);
+        return 0;
+    }
+    if(flag == 1){
+        //remove myPids[i] & pidsStrHistory[i]
+        for(i = pidI; i < sizePids - 1; i++){
+            myPids[i] = myPids[i+1];
+            pidsStrHistory[i] = pidsStrHistory[i+1];
+        }
+        myPids[sizePids-1] = -1;
+        sizePids--;
+    }
+    if(killRes == 0){
+        printf("> SUCCESS: pid = %d killed\n", currPid);
+        return 1;
+    }
+    
 }
 int redirectOut(char **args){
 
