@@ -10,49 +10,53 @@ l   -   exec_wait         no implemntation
 >   -   change STDOUT and exec_wait implement change stdout
 */
 
+//
+//shared constants
+extern char **history;
+extern int *myPids, sizePids;
 
   ////////////////////////////
  //   commands functions   //
 ////////////////////////////
 //"myMan" only
 //print manual
-int myMan(char **args, int *pids, int *sizePids);
+int myMan(char **args);
 //
 //path + arguments(...)
 //launch the app and wait for it to end
-int launchWait(char **args, int *pids, int *sizePids);
+int launchWait(char **args);
 //
 //path + arguments(...) + '&' at the end
 //launch the app and continue loop
-int launchContinue(char **args, int *pids, int *sizePids);
+int launchContinue(char **args);
 //
 //"tasks" only
 //print all background apps (pids)
-int tasks(char **args, int *pids, int *sizePids);
+int tasks(char **args);
 //
 //"return" at the beginnig and pid
 //wait for pid to finish all background pids
-int return_pid(char **args, int *pids, int *sizePids);
+int return_pid(char **args);
 //
 //path + arguments(...) + '>' + "output_file_name"
 //redirect STDOUT of app to "output_file_name"
-int redirectOut(char **args, int *pids, int *sizePids);
+int redirectOut(char **args);
 //
 //KEY=VALUE
 //sets enviorment variable key to value
-int mySetEnv(char **args, int *pids, int *sizePids);
+int mySetEnv(char **args);
 //
 //"print_env" only
 //prints EV that were set
-int myPrintEnv(char **args, int *pids, int *sizePids);
+int myPrintEnv(char **args);
 //
 //"show_history" only
 //prints history of commands
-int showHistory(char **args, int *pids, int *sizePids);
+int showHistory(char **args);
 //
 //"exit" only
 //activating show_history + exit loop
-int myExit(char **args, int *pids, int *sizePids);
+int myExit(char **args);
   ///////////////////////////
  //   commands settings   //
 ///////////////////////////
@@ -72,7 +76,7 @@ extern const char *commsCodes[] /* = {
     }*/;
 //
 //commands functions
-extern const int (*commsFuncs[]) (char **, int*, int*);
+extern const int (*commsFuncs[]) (char **);
 //
 //util func
 int commsNum();

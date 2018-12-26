@@ -2,7 +2,7 @@
 
 //
 //main shell loop
-void shellLoop(char **history, int *pids, int *sizePids)
+void shellLoop()
 {
     char *line;     //allocated in readLine
     char **args;    //allocated in splitLine
@@ -42,7 +42,7 @@ void shellLoop(char **history, int *pids, int *sizePids)
             //printArgs(args);
         //
         //run the command
-        status = runCommand(args, pids, sizePids);
+        status = runCommand(args);
         if(status == -1){
             fprintf(stderr, "certainy wrong input: %s", line);
         }
@@ -61,7 +61,7 @@ void shellLoop(char **history, int *pids, int *sizePids)
 }
 //
 //run relevant command function
-int runCommand(char **args, int *pids, int *sizePids)
+int runCommand(char **args)
 {
     int i, r = 1;
 
@@ -80,11 +80,11 @@ int runCommand(char **args, int *pids, int *sizePids)
         }
         //all commands
         if (strcmp(args[0], commsCodes[i]) == 0){
-            r = (*commsFuncs[i])(args, pids, sizePids);
+            r = (*commsFuncs[i])(args);
             //printf("matching command: %s\n", commsCodes[i]);
             //app commands
             if(r == 1 && isAppCommand(commsCodes[i]))
-            r = appLaunch(args, pids, sizePids);
+            r = appLaunch(args);
             break;
         }
     }
@@ -99,7 +99,7 @@ int runCommand(char **args, int *pids, int *sizePids)
 //
 //
 //called by runCommand to activate program
-int appLaunch(char **args, int *pids, int *sizePids)
+int appLaunch(char **args)
 {
         //printf("> appLaunch() called with args:\n");
         //printArgs(args);
@@ -191,8 +191,7 @@ int appLaunch(char **args, int *pids, int *sizePids)
         }
         //save pif if needed
         if(comm == 1){
-            pids[*sizePids] = pid;
-            *sizePids = (*sizePids) + 1;
+            myPids[sizePids++] = pid;
         }
     }
     int sTmp = argsCount(argv);

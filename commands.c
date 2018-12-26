@@ -2,6 +2,19 @@
 //Hodaya Simhi  -   313613226
 //
 #include "commands.h"
+//allocate history
+char **history = (char**) malloc(sizeof(char*) * histSize);
+if(history == NULL){
+perror("malloc err in main()");
+fprintf(stderr, "history buffer err, show_history won't work!\n");
+}
+//allocate pids history
+int sizePids = 0;
+int *myPids = (int*) malloc(sizeof(int) * histSize);
+if(myPids == NULL){
+perror("malloc err in main()");
+fprintf(stderr, "pids buff err, return won't work!\n");
+}
   //////////////////////////
  //   commands settings  //
 //////////////////////////
@@ -20,7 +33,7 @@ const char *commsCodes[]  = {
     "exit"          //args[0] = 'exit'
     };
 //commands matching function (order is important!)
-const int (*commsFuncs[]) (char **, int *, int *) = {
+const int (*commsFuncs[]) (char **) = {
     &myMan,
     &launchWait,
     &launchContinue,
@@ -42,7 +55,7 @@ int commsNum()
 ////////////////////////////////
 //
 //print manual
-int myMan(char **args, int *pids, int *sizePids){
+int myMan(char **args){
     if(args == NULL){
         fprintf(stderr, "no command recieved at myMan()\n");
         return 0;
@@ -73,36 +86,35 @@ int myMan(char **args, int *pids, int *sizePids){
     printf("> e.g. exit\n---------\n");
     return 1;
 }
-int launchWait(char **args, int *pids, int *sizePids){
+int launchWait(char **args){
     //all required job done in launchApp()
     return 1;
 }
-int launchContinue(char **args, int *pids, int *sizePids){
+int launchContinue(char **args){
     //all required job done in launchApp()
     return 1;
 }
-int tasks(char **args, int *pids, int *sizePids){
+int tasks(char **args){
     if(sizePids == 0){
         return -1;
     }
-    
 }
-int return_pid(char **args, int *pids, int *sizePids){
+int return_pid(char **args){
 
 }
-int redirectOut(char **args, int *pids, int *sizePids){
+int redirectOut(char **args){
 
 }
-int mySetEnv(char **args, int *pids, int *sizePids){
+int mySetEnv(char **args){
 
 }
-int myPrintEnv(char **args, int *pids, int *sizePids){
+int myPrintEnv(char **args){
 
 }
-int showHistory(char **args, int *pids, int *sizePids){
+int showHistory(char **args){
 
 }
-int myExit(char **args, int *pids, int *sizePids){
+int myExit(char **args){
 
 }
 //

@@ -3,9 +3,8 @@
 
 #include "commands.h"
 
-void shellLoop(char **history, int *pids, int *sizePids);
-int runCommand(char **args, int *pids, int *sizePids);
-int appLaunch(char **args, int *pids, int *sizePids);
-//wow
+void shellLoop();
+int runCommand(char **args);
+int appLaunch(char **args);
 
 #endif
