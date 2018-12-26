@@ -3,14 +3,14 @@
 //
 #include "commands.h"
 //allocate history
-char **history = (char**) malloc(sizeof(char*) * histSize);
+history = (char**) malloc(sizeof(char*) * histSize);
 if(history == NULL){
 perror("malloc err in main()");
 fprintf(stderr, "history buffer err, show_history won't work!\n");
 }
 //allocate pids history
 int sizePids = 0;
-int *myPids = (int*) malloc(sizeof(int) * histSize);
+myPids = (int*) malloc(sizeof(int) * histSize);
 if(myPids == NULL){
 perror("malloc err in main()");
 fprintf(stderr, "pids buff err, return won't work!\n");
