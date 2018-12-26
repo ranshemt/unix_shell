@@ -13,7 +13,8 @@ l   -   exec_wait         no implemntation
 //
 //shared constants
 extern char **history;
-extern int *myPids, sizePids;
+extern int *myPids, sizePids, *pidsStrHistory;
+int initSharedVars();
 
   ////////////////////////////
  //   commands functions   //

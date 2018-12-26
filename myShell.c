@@ -189,9 +189,14 @@ int appLaunch(char **args)
                 wpid = waitpid(pid, &status, WUNTRACED);
             } while (!WIFEXITED(status) && !WIFSIGNALED(status));
         }
-        //save pif if needed
+        //save pid if needed
         if(comm == 1){
-            myPids[sizePids++] = pid;
+            //save pid
+            myPids[sizePids] = pid;
+            //save index of matching line from history array
+            pidsStrHistory[sizePids] = argsCount(history) - 1;
+            //advance
+            sizePids++;
         }
     }
     int sTmp = argsCount(argv);

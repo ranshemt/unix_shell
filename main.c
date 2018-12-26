@@ -6,7 +6,11 @@
 //MAIN
 int main(int argc, char **argv)
 {
-  
+  if(initSharedVars() == 0){
+    fprintf(stderr, "error allocating memory for shared variables!\n");
+    fprintf(stderr, "Program won't start\n");
+    return 0;
+  }
   //
   // Run command loop.
   shellLoop();

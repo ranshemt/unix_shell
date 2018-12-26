@@ -1,19 +1,40 @@
-//Ran Shem Tov  -   206059586
-//Hodaya Simhi  -   313613226
+//Ran Shem Tov      -   206059586
+//Hodaya Simhi      -   313613226
+//
 //
 #include "commands.h"
-//allocate history
-history = (char**) malloc(sizeof(char*) * histSize);
-if(history == NULL){
-perror("malloc err in main()");
-fprintf(stderr, "history buffer err, show_history won't work!\n");
-}
-//allocate pids history
-int sizePids = 0;
-myPids = (int*) malloc(sizeof(int) * histSize);
-if(myPids == NULL){
-perror("malloc err in main()");
-fprintf(stderr, "pids buff err, return won't work!\n");
+char **history = NULL;
+int sizePids, *myPids, *pidsStrHistory;
+
+//init shared variables
+int initSharedVars(){
+    int i;
+    //allocate history
+    history = (char**) malloc(sizeof(char*) * histSize);
+    if(history == NULL){
+        perror("malloc err in initSharedVars()");
+        fprintf(stderr, "history buffer err\n");
+        return 0;
+    }
+    //allocate pids history
+    pidsStrHistory = (int*) malloc(sizeof(int) * histSize);
+    if(pidsStrHistory == NULL){
+        perror("malloc err in initSharedVars()");
+        fprintf(stderr, "pids buff err, return won't work!\n");
+        return 0;
+    }
+    //allocate pids
+    myPids = (int*) malloc(sizeof(int) * histSize);
+    if(myPids == NULL){
+        perror("malloc err in initSharedVars()");
+        fprintf(stderr, "pids buff err, return won't work!\n");
+        return 0;
+    }
+    //init myPids to -1
+    for(i = 0; i < histSize; i++)   myPids[i] = -1;
+    //pids size
+    sizePids = 0;
+    return 1;
 }
   //////////////////////////
  //   commands settings  //
@@ -98,6 +119,20 @@ int tasks(char **args){
     if(sizePids == 0){
         return -1;
     }
+    char *fPath = NULL, **argsTmp;
+    int currPid = -1, i, len;
+
+    for(i = 0; i < sizePids; i++){
+        currPid = myPids[i];
+        argsTmp = splitLine(history[i]);
+        //print
+        printf("> %s:%d\n", argsTmp[1], currPid);
+        fPath = NULL;
+        currPid = -1;
+    }
+    //free argsTmp
+
+    return 1;
 }
 int return_pid(char **args){
 
