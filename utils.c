@@ -68,7 +68,7 @@ char **splitLine(char *line)
 	token = strtok(line, tokDelim);
 	while (token != NULL)
 	{
-		printf("token: %s\n", token);
+		//printf("token: %s\n", token);
 		tokens[position] = token;
 		position++;
 

@@ -6,7 +6,7 @@ void shellLoop(char **history, int *pids)
 {
     char *line;     //allocated in readLine
     char **args;    //allocated in splitLine
-    int status, hisSize, sTmp;
+    int status, hisSize, sTmp, i;
     hisSize = argsCount(history);
     do
     {
@@ -35,7 +35,7 @@ void shellLoop(char **history, int *pids)
         args = splitLine(line);
         if(args == NULL){
             fprintf(stderr, "couldn't splitLine\n");
-            free(line);
+            if(line != NULL) free(line);
             continue;
         }
             //printf("> calling runCommand with args: \n");
@@ -52,11 +52,11 @@ void shellLoop(char **history, int *pids)
         //
         //free memory
         if(line != NULL)    free(line);
-        if(args != NULL){
-            while(*args != NULL) free(*args++);
-            free(args);
+        sTmp = argsCount(args);
+        for( i= 0; i < sTmp; i++){
+            if(args[i] != NULL) free(args[i]);
         }
-        free(line);
+        if(args != NULL) free(args);
     } while (status);
 }
 //
@@ -106,7 +106,7 @@ int appLaunch(char **args, int *pids)
     //vars
     pid_t pid, wpid;
     int status, comm = -1, i, lenT;
-    char **argv, *newOut;
+    char **argv, *newOut = NULL;
     //argv for exec()
     argv = (char**)malloc(tknsNum * sizeof(char *));
     //create argv for runApp&Wait
@@ -194,10 +194,11 @@ int appLaunch(char **args, int *pids)
             pids[arrSize(pids)] = pid;
         }
     }
-    if(argv != NULL){
-        while(*argv != NULL) free(*argv++);
-        free(argv);
+    int sTmp = argsCount(argv);
+    for(i = 0; i < sTmp; i++){
+        if(argv[i] != NULL) free(argv[i]);
     }
+    if(argv != NULL) free(argv);
     if(newOut != NULL) free(newOut);
     return 1;
 }
