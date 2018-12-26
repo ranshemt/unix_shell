@@ -14,7 +14,8 @@ int main(int argc, char **argv)
     fprintf(stderr, "history buffer err, show_history won't work!\n");
   }
   //allocate pids history
-  int *myPids, sTmp, i;
+  int *myPids, sTmp, i, sizePids = 0;
+  int *sizePidsPtr = &sizePids;
   myPids = (int*) malloc(sizeof(int) * histSize);
   if(myPids == NULL){
     perror("malloc err in main()");
@@ -22,7 +23,7 @@ int main(int argc, char **argv)
   }
   //
   // Run command loop.
-  shellLoop(myHistory, myPids);
+  shellLoop(myHistory, myPids, sizePidsPtr);
   //
   //free memory
   sTmp = argsCount(myHistory);

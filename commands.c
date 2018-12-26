@@ -20,7 +20,7 @@ const char *commsCodes[]  = {
     "exit"          //args[0] = 'exit'
     };
 //commands matching function (order is important!)
-const int (*commsFuncs[]) (char **, int *) = {
+const int (*commsFuncs[]) (char **, int *, int *) = {
     &myMan,
     &launchWait,
     &launchContinue,
@@ -42,7 +42,7 @@ int commsNum()
 ////////////////////////////////
 //
 //print manual
-int myMan(char **args, int *pids){
+int myMan(char **args, int *pids, int *sizePids){
     if(args == NULL){
         fprintf(stderr, "no command recieved at myMan()\n");
         return 0;
@@ -73,33 +73,36 @@ int myMan(char **args, int *pids){
     printf("> e.g. exit\n---------\n");
     return 1;
 }
-int launchWait(char **args, int *pids){
+int launchWait(char **args, int *pids, int *sizePids){
     //all required job done in launchApp()
     return 1;
 }
-int launchContinue(char **args, int *pids){
+int launchContinue(char **args, int *pids, int *sizePids){
     //all required job done in launchApp()
     return 1;
 }
-int tasks(char **args, int *pids){
+int tasks(char **args, int *pids, int *sizePids){
+    if(sizePids == 0){
+        return -1;
+    }
     
 }
-int return_pid(char **args, int *pids){
+int return_pid(char **args, int *pids, int *sizePids){
 
 }
-int redirectOut(char **args, int *pids){
+int redirectOut(char **args, int *pids, int *sizePids){
 
 }
-int mySetEnv(char **args, int *pids){
+int mySetEnv(char **args, int *pids, int *sizePids){
 
 }
-int myPrintEnv(char **args, int *pids){
+int myPrintEnv(char **args, int *pids, int *sizePids){
 
 }
-int showHistory(char **args, int *pids){
+int showHistory(char **args, int *pids, int *sizePids){
 
 }
-int myExit(char **args, int *pids){
+int myExit(char **args, int *pids, int *sizePids){
 
 }
 //

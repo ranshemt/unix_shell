@@ -2,7 +2,7 @@
 
 //
 //main shell loop
-void shellLoop(char **history, int *pids)
+void shellLoop(char **history, int *pids, int *sizePids)
 {
     char *line;     //allocated in readLine
     char **args;    //allocated in splitLine
@@ -42,12 +42,12 @@ void shellLoop(char **history, int *pids)
             //printArgs(args);
         //
         //run the command
-        status = runCommand(args, pids);
+        status = runCommand(args, pids, sizePids);
         if(status == -1){
             fprintf(stderr, "certainy wrong input: %s", line);
         }
         if(status == 0){
-            fprintf(stderr, "runCommand() received no args\n");
+            fprintf(stderr, "runCommand() didn't work\n");
         }
         //
         //free memory
@@ -61,7 +61,7 @@ void shellLoop(char **history, int *pids)
 }
 //
 //run relevant command function
-int runCommand(char **args, int *pids)
+int runCommand(char **args, int *pids, int *sizePids)
 {
     int i, r = 1;
 
@@ -75,16 +75,16 @@ int runCommand(char **args, int *pids)
     for (i = 0; i < commsNum(); i++)
     {
         //certain it's wrong command
-        if(strcmp(args[0], "err") == 0){
+        if(args == NULL){
             return -1;
         }
         //all commands
         if (strcmp(args[0], commsCodes[i]) == 0){
-            r = (*commsFuncs[i])(args, pids);
+            r = (*commsFuncs[i])(args, pids, sizePids);
             //printf("matching command: %s\n", commsCodes[i]);
             //app commands
             if(r == 1 && isAppCommand(commsCodes[i]))
-            r = appLaunch(args, pids);
+            r = appLaunch(args, pids, sizePids);
             break;
         }
     }
@@ -99,7 +99,7 @@ int runCommand(char **args, int *pids)
 //
 //
 //called by runCommand to activate program
-int appLaunch(char **args, int *pids)
+int appLaunch(char **args, int *pids, int *sizePids)
 {
         //printf("> appLaunch() called with args:\n");
         //printArgs(args);
@@ -191,7 +191,8 @@ int appLaunch(char **args, int *pids)
         }
         //save pif if needed
         if(comm == 1){
-            pids[arrSize(pids)] = pid;
+            pids[*sizePids] = pid;
+            *sizePids = (*sizePids) + 1;
         }
     }
     int sTmp = argsCount(argv);

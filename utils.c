@@ -175,12 +175,3 @@ void printArgs(char **args){
     while(*args != NULL) printf("%s", *args++);
 
 }
-
-int arrSize(int *a){
-    int n = 0;
-    if(a == NULL)   return n;
-    while(*a != '\0'){
-        n++;
-        a++;
-    }
-}

@@ -16,43 +16,43 @@ l   -   exec_wait         no implemntation
 ////////////////////////////
 //"myMan" only
 //print manual
-int myMan(char **args, int *pids);
+int myMan(char **args, int *pids, int *sizePids);
 //
 //path + arguments(...)
 //launch the app and wait for it to end
-int launchWait(char **args, int *pids);
+int launchWait(char **args, int *pids, int *sizePids);
 //
 //path + arguments(...) + '&' at the end
 //launch the app and continue loop
-int launchContinue(char **args, int *pids);
+int launchContinue(char **args, int *pids, int *sizePids);
 //
 //"tasks" only
 //print all background apps (pids)
-int tasks(char **args, int *pids);
+int tasks(char **args, int *pids, int *sizePids);
 //
 //"return" at the beginnig and pid
 //wait for pid to finish all background pids
-int return_pid(char **args, int *pids);
+int return_pid(char **args, int *pids, int *sizePids);
 //
 //path + arguments(...) + '>' + "output_file_name"
 //redirect STDOUT of app to "output_file_name"
-int redirectOut(char **args, int *pids);
+int redirectOut(char **args, int *pids, int *sizePids);
 //
 //KEY=VALUE
 //sets enviorment variable key to value
-int mySetEnv(char **args, int *pids);
+int mySetEnv(char **args, int *pids, int *sizePids);
 //
 //"print_env" only
 //prints EV that were set
-int myPrintEnv(char **args, int *pids);
+int myPrintEnv(char **args, int *pids, int *sizePids);
 //
 //"show_history" only
 //prints history of commands
-int showHistory(char **args, int *pids);
+int showHistory(char **args, int *pids, int *sizePids);
 //
 //"exit" only
 //activating show_history + exit loop
-int myExit(char **args, int *pids);
+int myExit(char **args, int *pids, int *sizePids);
   ///////////////////////////
  //   commands settings   //
 ///////////////////////////
@@ -72,7 +72,7 @@ extern const char *commsCodes[] /* = {
     }*/;
 //
 //commands functions
-extern const int (*commsFuncs[]) (char **, int*);
+extern const int (*commsFuncs[]) (char **, int*, int*);
 //
 //util func
 int commsNum();
