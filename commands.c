@@ -131,7 +131,11 @@ int tasks(char **args){
         currPid = -1;
     }
     //free argsTmp
-
+    int sTmp = argsCount(argsTmp);
+    for(i = 0; i < sTmp; i++){
+        if(argsTmp[i] != NULL) free(argsTmp[i]);
+    }
+    if(argsTmp != NULL) free(argsTmp);
     return 1;
 }
 int return_pid(char **args){
