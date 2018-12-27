@@ -7,6 +7,7 @@ void shellLoop()
     char *line;     //allocated in readLine
     char **args;    //allocated in splitLine
     int status, hisSize, sTmp, i;
+    char strTmp[2048];
     hisSize = argsCount(history);
     do
     {
@@ -18,10 +19,13 @@ void shellLoop()
             fprintf(stderr, "no line input!\n");
             continue;
         }
+        printf("> > > > line = %s\n", line);
         //
         //save line in history
         sTmp = argsCount(history);
+        printf("> > > > history size = %d\n", sTmp);
         history[sTmp] = (char*)malloc(sizeof(char)*(strlen(line)+1));
+        printf("> > > > allocated memory in index %d of history : %p\n", sTmp, history[sTmp]);
         if(history[sTmp] == NULL){
             perror("malloc err in shellLoop()");
             fprintf(stderr, "malloc err for history. %s won't be saved\n", line);
@@ -29,17 +33,26 @@ void shellLoop()
             continue;
         }
         strcpy(history[sTmp], line);
+        printf("> > > > after copy: %s\n", history[sTmp]);
         history[sTmp + 1] = NULL;
         //
         //split line into args
-        args = splitLine(line);
+        strcpy(strTmp, line);
+        args = splitLine(strTmp);
         if(args == NULL){
             fprintf(stderr, "couldn't splitLine\n");
             if(line != NULL) free(line);
             continue;
         }
-            //printf("> calling runCommand with args: \n");
-            //printArgs(args);
+            // printf("> args: \n");
+            // printArgs(args);
+        //
+        if(strcmp("!", args[0]) == 0){
+            histNum = -1;
+            histNum = atoi(args[1]);
+            strcpy(strTmp, history[histNum]);
+            args = splitLine(strTmp);
+        }
         //
         //run the command
         status = runCommand(args);
@@ -63,6 +76,9 @@ void shellLoop()
         // }
         if(args != NULL){
             free(args);
+        }
+        if(status == -99){
+            break;
         }
     } while (status);
 }
@@ -112,7 +128,7 @@ int appLaunch(char **args)
         //printArgs(args);
     //vars
     pid_t pid, wpid;
-    int status, comm = -1, i, lenT;
+    int status, comm = -1, i, lenT, outFD, s;
     char **argv, *newOut = NULL;
     //argv for exec()
     argv = (char**)malloc(tknsNum * sizeof(char *));
@@ -164,15 +180,26 @@ int appLaunch(char **args)
         }
         strcpy(newOut, args[argsCount(args) - 1]);
     }
-        //printf("> > appLaunch()\n");
+    //
+    //out redirection
+    if(comm == 2){
+        s = argsCount(args);
+        outFD = open(args[s-1], O_WRONLY | O_CREAT | O_TRUNC,S_IRWXU);
+    }
     //fork
     pid = fork();
     if (pid == 0)
     {
         // Child process
-            //printf("> >callinc execv with path = args[1] = %s\n", args[1]);
-            //printf("> >calling execv with argv: \n");
-            //printArgs(argv);
+        //
+        //change output stream
+        if(comm == 2){
+            if(close(STDOUT_FILENO) < 0){
+                perror("close in redirect");
+                return 0;
+            }
+            dup(outFD);
+        }
         if (execv(args[1], argv) == -1)
         {
             perror("> >execv in appLaunch()");

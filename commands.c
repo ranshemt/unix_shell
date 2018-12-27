@@ -4,7 +4,7 @@
 //
 #include "commands.h"
 char **history = NULL, **myEnvs = NULL;
-int sizePids, *myPids, *pidsStrHistory;
+int sizePids, *myPids, *pidsStrHistory, histNum;
 
 //init shared variables
 int initSharedVars(){
@@ -56,9 +56,10 @@ const char *commsCodes[]  = {
     "return",       //args[0] = "return" args[1] = pid
     ">",            //args[0] = '>', args[1] = output, args[2] = path, args[..] = arguments
     "=",            //args[0] = '=', args[1] = KEY, args[2] = VALUE
-    "print_env"     //args[0] = "print_env",
+    "print_env" ,    //args[0] = "print_env",
     "show_history", //args[0] = "show_history"
-    "exit"          //args[0] = 'exit'
+    "exit",          //args[0] = 'exit'
+    "!"
     };
 //commands matching function (order is important!)
 const int (*commsFuncs[]) (char **) = {
@@ -71,7 +72,8 @@ const int (*commsFuncs[]) (char **) = {
     &mySetEnv,
     &myPrintEnv,
     &showHistory,
-    &myExit
+    &myExit,
+    &runByHistory
     };
 //
 int commsNum()
@@ -127,22 +129,18 @@ int tasks(char **args){
         printf("> SUCCESS: no apps in background\n");
         return 1;
     }
-    char **argsTmp;
+    char **argsTmp, histCpy[2048];
     int currPid = -1, i, len;
 
     for(i = 0; i < sizePids; i++){
         currPid = myPids[i];
-        argsTmp = splitLine(history[pidsStrHistory[i]]);
+        printf("> > > > i = %d, pid = %d, pidsStrHistory[i] = %d\n", i, currPid, pidsStrHistory[i]);
+        strcpy(histCpy, history[pidsStrHistory[i]]);
+        argsTmp = splitLine(histCpy);
         //print
-        printf("> %s:%d\n", argsTmp[1], currPid);
+        printf("> > > > %s:%d\n", argsTmp[1], currPid);
         currPid = -1;
     }
-    //free argsTmp
-    int sTmp = argsCount(argsTmp);
-    for(i = 0; i < sTmp; i++){
-        if(argsTmp[i] != NULL) free(argsTmp[i]);
-    }
-    if(argsTmp != NULL) free(argsTmp);
     return 1;
 }
 int return_pid(char **args){
@@ -155,7 +153,8 @@ int return_pid(char **args){
     tmpS = (char*) malloc(sizeof(char) * (len+1));
     //check
     strcpy(tmpS, args[1]);
-    int currPid = atoi(tmpS);
+    printf("< < < < tmpS: %s\n", tmpS);
+    int currPid = betterAtoi(tmpS);
     if(currPid == 0){
         printf("> ERR: no valid pid for args[1] = %s\n", args[1]);
         return 0;
@@ -190,7 +189,7 @@ int return_pid(char **args){
     }
 }
 int redirectOut(char **args){
-
+    return 1;
 }
 int mySetEnv(char **args){
     if(args == NULL || argsCount(args) != 3){
@@ -223,13 +222,14 @@ int mySetEnv(char **args){
     strcpy(myEnvs[envsSize], key);
     //terminate myEnvs
     myEnvs[envsSize+1] = NULL;
+    //printf("myEnvs: %s\n", myEnvs[envsSize]);
     //set
     envReturn = setenv(key, val, 1);
     if(envReturn == -1){
         perror("setenv() err");
         return 0;
     }
-    printf("> SUCCESS: %s was added with value %s", key, val);
+    printf("> SUCCESS: %s was added with value %s\n", key, val);
     return 1;
 }
 int myPrintEnv(char **args){
@@ -239,14 +239,36 @@ int myPrintEnv(char **args){
         printf("> SUCCESS: no enviorment variables set\n");
         return 1;
     }
+    printf("> SUCCESS: printing enviorment variables\n> ");
     for(i = 0; i < envsSize; i++){
-        printf("%s", myEnvs[i]);
+        printf("%s, ", myEnvs[i]);
     }
+    printf("\n");
     return 1;
 }
 int showHistory(char **args){
-
+    if(history == NULL){
+        fprintf(stderr, "no valid history pointer\n");
+        return 0;
+    }
+    int size = argsCount(history), i;
+    if(size == 0){
+        printf("> SUCCESS: no history\n");
+        return 1;
+    }
+    for(i = 0; i < size; i++){
+        printf("> %d) %s", i, history[i]);
+    }
+    return 1;
+}
+int runByHistory(char **args){
+    printf("runByHistory()\n");
+    return 1;
 }
 int myExit(char **args){
-
+    printf("> EXITING:\n");
+    showHistory(NULL);
+    printf("> THANK YOU\n");
+    printf("> GOOD BYE:)\n");
+    return -99;
 }

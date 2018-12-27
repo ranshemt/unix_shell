@@ -14,7 +14,7 @@ l   -   exec_wait         no implemntation
 //shared constants
 extern char **history;
 extern char **myEnvs;
-extern int *myPids, sizePids, *pidsStrHistory;
+extern int *myPids, sizePids, *pidsStrHistory, histNum;
 int initSharedVars();
 
   ////////////////////////////
@@ -55,6 +55,9 @@ int myPrintEnv(char **args);
 //"show_history" only
 //prints history of commands
 int showHistory(char **args);
+//!+number
+//run that command from history
+int runByHistory(char **args);
 //
 //"exit" only
 //activating show_history + exit loop

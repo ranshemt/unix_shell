@@ -8,14 +8,20 @@ int isAppCommand(const char *code){
 }
 //
 //
-int isCaps(char *str){
-    if(str == NULL) return -1;
-    int l = strlen(str), i;
-    for(i = 0; i < l; i++){
-        if(str[i] >= 'a' && str[i] <= 'z')
-            return 0;
-    }
-    return 1;
+int betterAtoi(char *s){
+	if(s == NULL){
+		fprintf(stderr, "betterAtoi() empty string\n");
+		return 0;
+	}
+	int n = 0;
+	while(*s != '\0' && *s != '\n'){
+		if((!(*s <= '9' && *s>= '0'))){
+			return 0;
+		}
+		n = (*s - '0') + (n * 10);
+		s++;
+	}
+	return n;
 }
 //
 //
@@ -38,7 +44,7 @@ char *readLine(void)
 //splitLine()
 char **splitLine(char *line)
 {
-	int position = 0, isEqueal = 0;
+	int position = 0, isEqueal = 0, isAx = 0;
 	char **tokens = (char**)malloc(tknsNum * sizeof(char *));
 	char *token, *lineCpy;
 	lineCpy = (char *)malloc(sizeof(char) * (strlen(line) + 1));
@@ -61,6 +67,8 @@ char **splitLine(char *line)
 		if(*lineCpy == '='){
 			isEqueal = 1;
 		}
+		if(*lineCpy == '!')
+			isAx = 1;
 		lineCpy++;
 	}
 	//
@@ -77,12 +85,28 @@ char **splitLine(char *line)
 			break;
 		}
 		token = strtok(NULL, tokDelim);
+		
 	}
     //terminate
 	tokens[position] = NULL;
 	//
 	//simple commands
 	if (strcmp(tokens[0], "myMan") == 0 || strcmp(tokens[0], "tasks") == 0 || strcmp(tokens[0], "return") == 0 || strcmp(tokens[0], "print_env") == 0 || strcmp(tokens[0], "show_history") == 0 || strcmp(tokens[0], "exit") == 0) {
+		return tokens;
+	}
+	//
+	//!
+	if(argsCount(tokens) == 1 && isAx == 1){
+		tokens[1] = tokens[0];
+		//tokens[0] = "!";
+		tokens[0] = (char*)malloc(sizeof(char) * 2);
+        if (!tokens[0])
+        {
+            fprintf(stderr, "splitLine: malloc error\n");
+            return NULL;
+        }
+		strcpy(tokens[0], "!");
+		tokens[2] = NULL;
 		return tokens;
 	}
 	//
