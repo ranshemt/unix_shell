@@ -5,6 +5,7 @@
 #include "utils.h"
 //
 //
+//
 int isAppCommand(const char *code){
     if(strcmp(code, "l") == 0 || strcmp(code, "&") == 0 || strcmp(code, ">") == 0 || strcmp(code, "<") == 0)
         return 1;
