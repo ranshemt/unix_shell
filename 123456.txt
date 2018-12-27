@@ -1,0 +1,26 @@
+total 116
+drwxrwxr-x  3 ranshem ranshem  4096 Dec 27 10:56 .
+-rwx------  1 ranshem ranshem     0 Dec 27 10:56 123456.txt
+-rwxrwxr-x  1 ranshem ranshem 31136 Dec 27 10:56 shell
+drwxrwxr-x  8 ranshem ranshem  4096 Dec 27 10:45 .git
+-rw-rw-r--  1 ranshem ranshem  6712 Dec 27 10:45 myShell.c
+drwxr-xr-x 25 ranshem ranshem  4096 Dec 27 10:43 ..
+-rwx------  1 ranshem ranshem   171 Dec 27 10:42 123.txt
+-rw-rw-r--  1 ranshem ranshem  8053 Dec 27 10:29 commands.c
+-rw-rw-r--  1 ranshem ranshem  2350 Dec 27 10:23 commands.h
+-rwxrwxrwx  1 ranshem ranshem  4741 Dec 27 10:23 utils.c
+-rwxrwxrwx  1 ranshem ranshem   571 Dec 27 08:02 utils.h
+-rwx------  1 ranshem ranshem   163 Dec 27 06:06 chen.txt
+-rwx------  1 ranshem ranshem   154 Dec 27 06:02 8.txt
+-rwx------  1 ranshem ranshem     0 Dec 27 06:01 7.txt
+-rwx------  1 ranshem ranshem     0 Dec 27 05:59 out99.txt
+-rw-rw-r--  1 ranshem ranshem     0 Dec 27 05:54 9.txt
+-rwx------  1 ranshem ranshem     0 Dec 27 05:52 o4.txt
+-rwx------  1 ranshem ranshem     0 Dec 27 05:47 o1.txt
+-rwx------  1 ranshem ranshem     0 Dec 27 05:44 o5.txt
+-rwx------  1 ranshem ranshem     0 Dec 27 05:43 out3.txt
+-rwx------  1 ranshem ranshem     0 Dec 27 05:41 out2.txt
+-rwx------  1 ranshem ranshem     0 Dec 27 05:40 out1.txt
+-rw-rw-r--  1 ranshem ranshem   699 Dec 27 04:21 main.c
+-rw-rw-r--  1 ranshem ranshem   142 Dec 26 11:57 myShell.h
+-rwxrwxrwx  1 ranshem ranshem 18256 Dec 24 08:17 -shell

@@ -18,6 +18,8 @@
 #define tknsNum 64
 #define tokDelim "!= \t\r\n\a"
 #define histSize 128
+#define errOk 9
+#define errBad 10
 //
 //methods
 int isAppCommand(const char *code);

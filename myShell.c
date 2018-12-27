@@ -58,22 +58,19 @@ void shellLoop()
         //
         //run the command
         status = runCommand(args);
-        if(status == -1){
-            fprintf(stderr, "probably wrong input: %s", line);
+        if(status == errOk){
+            fprintf(stderr, "runCommand(%s) didn't work\n", line);
         }
-        if(status == 0){
-            fprintf(stderr, "runCommand() didn't work\n");
+        if(status == errBad){
+            fprintf(stderr, "FATAL: runCommand(%s) didn't work\n", line);
         }
         //
         //free memory
         if(line != NULL)    free(line);
-        if(args == NULL){
-            continue;
-        }
         if(args != NULL){
             free(args);
         }
-    } while (status);
+    } while (status != errBad);
 }
 //
 //run relevant command function
@@ -172,23 +169,22 @@ int appLaunch(char **args)
         strcpy(newOut, args[argsCount(args) - 1]);
     }
     //
-    //out redirection
-    if(comm == 2){
-        s = argsCount(args);
-        redirectFD = open(args[s-1], O_WRONLY | O_CREAT | O_TRUNC,S_IRWXU);
-    }
-    //
-    //in redirection
-    if(comm == 3){
-        s = argsCount(args);
-        redirectFD = open(args[s-1], O_WRONLY);
-        printf("> > file %s opened with fd = %d\n", args[s-1], redirectFD);
-    }
-    //
     //fork
     pid = fork();
     if (pid == 0)
     {
+        //
+        //out redirection
+        if(comm == 2){
+            s = argsCount(args);
+            redirectFD = open(args[s-1], O_WRONLY | O_CREAT | O_TRUNC,S_IRWXU);
+        }
+        //
+        //in redirection
+        if(comm == 3){
+            s = argsCount(args);
+            redirectFD = open(args[s-1], O_RDONLY);
+        }
         // Child process
         //
         //change output stream
@@ -207,7 +203,6 @@ int appLaunch(char **args)
                 return 0;
             }
             dup(redirectFD);
-            printf("> > comm = 3\n");
         }
         if (execv(args[1], argv) == -1)
         {
@@ -226,12 +221,13 @@ int appLaunch(char **args)
     {
         // Parent process
         //wait if needed
-        if(comm == 0 || comm == 2){
+        if(comm == 0 || comm == 2 || comm == 3){
             do
             {
                 wpid = waitpid(pid, &status, WUNTRACED);
             } while (!WIFEXITED(status) && !WIFSIGNALED(status));
         }
+        if(comm == 3)   printf("\n");
         //save pid if needed
         if(comm == 1){
             //save pid

@@ -90,11 +90,11 @@ int commsNum()
 int myMan(char **args){
     if(args == NULL){
         fprintf(stderr, "no command recieved at myMan()\n");
-        return 0;
+        return errOk;
     }
     if(argsCount(args) > 1){
         fprintf(stderr, "too many argumants recieved at myMan()\n");
-        return 0;
+        return errOk;
     }
     printf("> 'myMan' for manual\n---------\n");
     printf("> e.g. 'myMan'\n---------\n");
@@ -147,7 +147,7 @@ int tasks(char **args){
 int return_pid(char **args){
     if(args[1] == NULL){
         fprintf(stderr, "no pid for command return\n");
-        return 0;
+        return errOk;
     }
     char *tmpS;
     int len = strlen(args[1]);
@@ -157,7 +157,7 @@ int return_pid(char **args){
     int currPid = betterAtoi(tmpS);
     if(currPid == 0){
         printf("> ERR: no valid pid for args[1] = %s\n", args[1]);
-        return 0;
+        return errOk;
     }
     int i, flag = 0, pidI, status, wpid;
     for(i = 0; i < sizePids; i++){
@@ -173,7 +173,7 @@ int return_pid(char **args){
     }
     if(flag == 0){
         printf("> ERR: requested pid = %d wasn't found\n", currPid);
-        return 0;
+        return errOk;
     }
     if(flag == 1){
         //remove myPids[i] & pidsStrHistory[i]
@@ -197,7 +197,7 @@ int redirectIn(char **args){
 int mySetEnv(char **args){
     if(args == NULL || argsCount(args) != 3){
         fprintf(stderr, "not enough args in redirectOut\n");
-        return 0;
+        return errOk;
     }
     char *key, *val;
     int keyLen, valLen, envsSize = 0, envReturn;
@@ -206,13 +206,13 @@ int mySetEnv(char **args){
     key = (char*)malloc(sizeof(char)*(keyLen+1));
     if(key == NULL){
         perror("malloc error in mySetEnv()");
-        return 0;
+        return errBad;
     }
     strcpy(key, args[1]);
     val = (char*)malloc(sizeof(char)*(valLen+1));
     if(val == NULL){
         perror("malloc error in mySetEnv()");
-        return 0;
+        return errBad;
     }
     strcpy(val, args[2]);
     //add to myEnvs
@@ -220,7 +220,7 @@ int mySetEnv(char **args){
     myEnvs[envsSize] = (char*)malloc(sizeof(char)*(keyLen + 1));
     if(val == NULL){
         perror("malloc error in mySetEnv()");
-        return 0;
+        return errBad;
     }
     strcpy(myEnvs[envsSize], key);
     //terminate myEnvs
@@ -229,7 +229,7 @@ int mySetEnv(char **args){
     envReturn = setenv(key, val, 1);
     if(envReturn == -1){
         perror("setenv() err");
-        return 0;
+        return errOk;
     }
     printf("> SUCCESS: %s was added with value %s\n", key, val);
     return 1;
@@ -251,7 +251,7 @@ int myPrintEnv(char **args){
 int showHistory(char **args){
     if(history == NULL){
         fprintf(stderr, "no valid history pointer\n");
-        return 0;
+        return errOk;
     }
     int size = argsCount(history), i;
     if(size == 0){
@@ -271,5 +271,5 @@ int myExit(char **args){
     showHistory(NULL);
     printf("> THANK YOU\n");
     printf("> GOOD BYE:)\n");
-    return -99;
+    return 1;
 }
