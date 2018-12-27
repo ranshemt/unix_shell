@@ -59,7 +59,8 @@ const char *commsCodes[]  = {
     "print_env" ,    //args[0] = "print_env",
     "show_history", //args[0] = "show_history"
     "exit",          //args[0] = 'exit'
-    "!"
+    "!",
+    "<"
     };
 //commands matching function (order is important!)
 const int (*commsFuncs[]) (char **) = {
@@ -73,7 +74,8 @@ const int (*commsFuncs[]) (char **) = {
     &myPrintEnv,
     &showHistory,
     &myExit,
-    &runByHistory
+    &runByHistory,
+    &redirectIn
     };
 //
 int commsNum()
@@ -187,6 +189,9 @@ int return_pid(char **args){
     }
 }
 int redirectOut(char **args){
+    return 1;
+}
+int redirectIn(char **args){
     return 1;
 }
 int mySetEnv(char **args){

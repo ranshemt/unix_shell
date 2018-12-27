@@ -59,6 +59,9 @@ int showHistory(char **args);
 //run that command from history
 int runByHistory(char **args);
 //
+//in
+int redirectIn(char **args);
+//
 //"exit" only
 //activating show_history + exit loop
 int myExit(char **args);

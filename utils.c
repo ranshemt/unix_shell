@@ -2,7 +2,7 @@
 //
 //
 int isAppCommand(const char *code){
-    if(strcmp(code, "l") == 0 || strcmp(code, "&") == 0 || strcmp(code, ">") == 0)
+    if(strcmp(code, "l") == 0 || strcmp(code, "&") == 0 || strcmp(code, ">") == 0 || strcmp(code, "<") == 0)
         return 1;
     return 0;
 }
@@ -85,7 +85,6 @@ char **splitLine(char *line)
 			break;
 		}
 		token = strtok(NULL, tokDelim);
-		
 	}
     //terminate
 	tokens[position] = NULL;
@@ -127,7 +126,7 @@ char **splitLine(char *line)
 		tokens[3] = NULL;
 		return tokens;
 	}
-	int isAmper = 0, isOutput = 0, i;
+	int isAmper = 0, isOutput = 0, isIn = 0, i;
 	//
 	//&
 	if (argsCount(tokens) >= 2 && strcmp(tokens[argsCount(tokens) - 1], "&") == 0) {
@@ -148,8 +147,10 @@ char **splitLine(char *line)
 	}
 	int tmp;
 	//
-	//>
-	if (argsCount(tokens) >= 3 && strcmp(tokens[argsCount(tokens) - 2], ">") == 0) {
+	//In/Out
+	if(argsCount(tokens) >= 3 && strcmp(tokens[argsCount(tokens) - 2], ">") == 0)	isOutput = 1;
+	if (argsCount(tokens) >= 3 && strcmp(tokens[argsCount(tokens) - 2], "<") == 0) isIn = 1;
+	if(isOutput == 1 || isIn == 1){
 		isOutput = 1;
 		//push ">" at the beginning of tokens && remove ">" from tokens[second last]
 		tmp = argsCount(tokens);
@@ -163,12 +164,13 @@ char **splitLine(char *line)
             fprintf(stderr, "splitLine: malloc error\n");
             return NULL;
         }
-		strcpy(tokens[0], ">");
+		if(isOutput == 1)	strcpy(tokens[0], ">");
+		if(isIn == 1)	strcpy(tokens[0], "<");
 		return tokens;
 	}
 	//
 	//l
-	if (isAmper == 0 && isOutput == 0) {
+	if (isAmper == 0 && isOutput == 0 && isIn == 0) {
 		//push "l" at the beginning of tokens
 		tmp = argsCount(tokens);
 		for (i = tmp; i >= 1; i--) {

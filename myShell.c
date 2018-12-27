@@ -118,7 +118,7 @@ int appLaunch(char **args)
 {
     //vars
     pid_t pid, wpid;
-    int status, comm = -1, i, lenT, outFD, s;
+    int status, comm = -1, i, lenT, redirectFD, s;
     char **argv, *newOut = NULL;
     //argv for exec()
     argv = (char**)malloc(tknsNum * sizeof(char *));
@@ -150,8 +150,9 @@ int appLaunch(char **args)
         argv[++i] = NULL;
     }
     //create argv for runAppRedirectOutput&Wait
-    if(strcmp(args[0], ">") == 0){
-        comm = 2;
+    if(strcmp(args[0], ">") == 0 || strcmp(args[0], "<") == 0){
+        if(strcmp(args[0], ">") == 0)   comm = 2;
+        if(strcmp(args[0], "<") == 0)   comm = 3;
         for(i = 1; i < argsCount(args)-1; i++){
             lenT = strlen(args[i]);
             argv[i-1] = (char*)malloc(sizeof(char)*(lenT+1));
@@ -174,7 +175,14 @@ int appLaunch(char **args)
     //out redirection
     if(comm == 2){
         s = argsCount(args);
-        outFD = open(args[s-1], O_WRONLY | O_CREAT | O_TRUNC,S_IRWXU);
+        redirectFD = open(args[s-1], O_WRONLY | O_CREAT | O_TRUNC,S_IRWXU);
+    }
+    //
+    //in redirection
+    if(comm == 3){
+        s = argsCount(args);
+        redirectFD = open(args[s-1], O_WRONLY);
+        printf("> > file %s opened with fd = %d\n", args[s-1], redirectFD);
     }
     //
     //fork
@@ -189,7 +197,17 @@ int appLaunch(char **args)
                 perror("close in redirect");
                 return 0;
             }
-            dup(outFD);
+            dup(redirectFD);
+        }
+        //
+        //change input stream
+        if(comm == 3){
+            if(close(STDIN_FILENO) < 0){
+                perror("close in redirect");
+                return 0;
+            }
+            dup(redirectFD);
+            printf("> > comm = 3\n");
         }
         if (execv(args[1], argv) == -1)
         {
@@ -223,10 +241,6 @@ int appLaunch(char **args)
             //advance
             sizePids++;
         }
-    }
-    int sTmp = argsCount(argv);
-    for(i = 0; i < sTmp; i++){
-        if(argv[i] != NULL) free(argv[i]);
     }
     if(argv != NULL) free(argv);
     if(newOut != NULL) free(newOut);
