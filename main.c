@@ -22,5 +22,10 @@ int main(int argc, char **argv)
   }
   if(history != NULL) free (history);
   if(myPids != NULL)  free(myPids);
+  sTmp = argsCount(myEnvs), i;
+  for(i = 0; i< sTmp; i++){
+    if(myEnvs[i] != NULL) free(myEnvs[i]);
+  }
+  if(myEnvs != NULL) free (myEnvs);
   return 0;
 }

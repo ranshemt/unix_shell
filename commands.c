@@ -3,7 +3,7 @@
 //
 //
 #include "commands.h"
-char **history = NULL;
+char **history = NULL, **myEnvs = NULL;
 int sizePids, *myPids, *pidsStrHistory;
 
 //init shared variables
@@ -14,6 +14,13 @@ int initSharedVars(){
     if(history == NULL){
         perror("malloc err in initSharedVars()");
         fprintf(stderr, "history buffer err\n");
+        return 0;
+    }
+    //allocate envs
+    myEnvs = (char**) malloc(sizeof(char*) * histSize);
+    if(myEnvs == NULL){
+        perror("malloc err in initSharedVars()");
+        fprintf(stderr, "envs buffer err\n");
         return 0;
     }
     //allocate pids history
@@ -118,7 +125,7 @@ int launchContinue(char **args){
 int tasks(char **args){
     if(sizePids == 0){
         printf("> SUCCESS: no apps in background\n");
-        return 0;
+        return 1;
     }
     char **argsTmp;
     int currPid = -1, i, len;
@@ -153,14 +160,13 @@ int return_pid(char **args){
         printf("> ERR: no valid pid for args[1] = %s\n", args[1]);
         return 0;
     }
-    int i, flag = 0, killRes, pidI;
+    int i, flag = 0, pidI, status, wpid;
     for(i = 0; i < sizePids; i++){
         if(myPids[i] == currPid){
-            killRes = kill(myPids[i], 0);
-            if(killRes == -1){
-                perror("kill in return_pid");
-                return 0;
-            }
+            do
+            {
+                wpid = waitpid(currPid, &status, WUNTRACED);
+            } while (!WIFEXITED(status) && !WIFSIGNALED(status));
             flag = 1;
             pidI = i;
             break;
@@ -178,68 +184,69 @@ int return_pid(char **args){
         }
         myPids[sizePids-1] = -1;
         sizePids--;
-    }
-    if(killRes == 0){
-        printf("> SUCCESS: pid = %d killed\n", currPid);
+        //print success message
+        printf("> SUCCESS: pid = %d finished\n", currPid);
         return 1;
     }
-    
 }
 int redirectOut(char **args){
 
 }
 int mySetEnv(char **args){
-
+    if(args == NULL || argsCount(args) != 3){
+        fprintf(stderr, "not enough args in redirectOut\n");
+        return 0;
+    }
+    char *key, *val;
+    int keyLen, valLen, envsSize = 0, envReturn;
+    keyLen = strlen(args[1]);
+    valLen = strlen(args[2]);
+    key = (char*)malloc(sizeof(char)*(keyLen+1));
+    if(key == NULL){
+        perror("malloc error in mySetEnv()");
+        return 0;
+    }
+    strcpy(key, args[1]);
+    val = (char*)malloc(sizeof(char)*(valLen+1));
+    if(val == NULL){
+        perror("malloc error in mySetEnv()");
+        return 0;
+    }
+    strcpy(val, args[2]);
+    //add to myEnvs
+    envsSize = argsCount(myEnvs);
+    myEnvs[envsSize] = (char*)malloc(sizeof(char)*(keyLen + 1));
+    if(val == NULL){
+        perror("malloc error in mySetEnv()");
+        return 0;
+    }
+    strcpy(myEnvs[envsSize], key);
+    //terminate myEnvs
+    myEnvs[envsSize+1] = NULL;
+    //set
+    envReturn = setenv(key, val, 1);
+    if(envReturn == -1){
+        perror("setenv() err");
+        return 0;
+    }
+    printf("> SUCCESS: %s was added with value %s", key, val);
+    return 1;
 }
 int myPrintEnv(char **args){
-
+    int i, envsSize = 0;
+    envsSize = argsCount(myEnvs);
+    if(envsSize == 0){
+        printf("> SUCCESS: no enviorment variables set\n");
+        return 1;
+    }
+    for(i = 0; i < envsSize; i++){
+        printf("%s", myEnvs[i]);
+    }
+    return 1;
 }
 int showHistory(char **args){
 
 }
 int myExit(char **args){
 
-}
-//
-//
-//
-//
-//cd
-int lsh_cd(char **args, int *pids)
-{
-    if (args[1] == NULL)
-    {
-        fprintf(stderr, "lsh: expected argument to \"cd\"\n");
-    }
-    else
-    {
-        if (chdir(args[1]) != 0)
-        {
-            perror("lsh");
-        }
-    }
-    return 1;
-}
-//
-//help
-int lsh_help(char **args, int *pids)
-{
-    int i;
-    printf("Stephen Brennan's LSH\n");
-    printf("Type program names and arguments, and hit enter.\n");
-    printf("The following are built in:\n");
-
-    for (i = 0; i < commsNum(); i++)
-    {
-        printf("  %s\n", commsCodes[i]);
-    }
-
-    printf("Use the man command for information on other programs.\n");
-    return 1;
-}
-//
-//exit
-int lsh_exit(char **args, int *pids)
-{
-    return 0;
 }
