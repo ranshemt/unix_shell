@@ -29,5 +29,6 @@ void printArgs(char **args);
 int argsCount(char **args);
 int arrSize(int *a);
 int betterAtoi(char *s);
+int freeArgs(char **);
 //
 #endif

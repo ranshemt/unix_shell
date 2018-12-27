@@ -157,6 +157,7 @@ int return_pid(char **args){
     int currPid = betterAtoi(tmpS);
     if(currPid == 0){
         printf("> ERR: no valid pid for args[1] = %s\n", args[1]);
+        if(tmpS != NULL)    free(tmpS);
         return errOk;
     }
     int i, flag = 0, pidI, status, wpid;
@@ -173,6 +174,7 @@ int return_pid(char **args){
     }
     if(flag == 0){
         printf("> ERR: requested pid = %d wasn't found\n", currPid);
+        if(tmpS != NULL)    free(tmpS);
         return errOk;
     }
     if(flag == 1){
@@ -185,8 +187,10 @@ int return_pid(char **args){
         sizePids--;
         //print success message
         printf("> SUCCESS: pid = %d finished\n", currPid);
+        if(tmpS != NULL)    free(tmpS);
         return 1;
     }
+    if(tmpS != NULL)    free(tmpS);
 }
 int redirectOut(char **args){
     return 1;
@@ -212,6 +216,7 @@ int mySetEnv(char **args){
     val = (char*)malloc(sizeof(char)*(valLen+1));
     if(val == NULL){
         perror("malloc error in mySetEnv()");
+        if(key != NULL) free(key);
         return errBad;
     }
     strcpy(val, args[2]);
@@ -220,6 +225,8 @@ int mySetEnv(char **args){
     myEnvs[envsSize] = (char*)malloc(sizeof(char)*(keyLen + 1));
     if(val == NULL){
         perror("malloc error in mySetEnv()");
+        if(key != NULL) free(key);
+        if(val != NULL) free(val);
         return errBad;
     }
     strcpy(myEnvs[envsSize], key);
@@ -232,6 +239,8 @@ int mySetEnv(char **args){
         return errOk;
     }
     printf("> SUCCESS: %s was added with value %s\n", key, val);
+    if(key != NULL) free(key);
+    if(val != NULL) free(val);
     return 1;
 }
 int myPrintEnv(char **args){

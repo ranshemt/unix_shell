@@ -67,10 +67,15 @@ void shellLoop()
         //
         //free memory
         if(line != NULL)    free(line);
-        if(args != NULL){
-            free(args);
-        }
+        freeArgs(args);
     } while (status != errBad);
+    //
+    //free memory
+    int sTmp = 0;
+    if(myPids != NULL)  free(myPids);
+    if(pidsStrHistory != NULL)  free(pidsStrHistory);
+    freeArgs(myEnvs);
+    freeArgs(history);
 }
 //
 //run relevant command function
@@ -238,7 +243,8 @@ int appLaunch(char **args)
             sizePids++;
         }
     }
-    if(argv != NULL) free(argv);
+    int s = 0;
     if(newOut != NULL) free(newOut);
+    freeArgs(argv);
     return 1;
 }

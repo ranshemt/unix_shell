@@ -77,7 +77,12 @@ char **splitLine(char *line)
 	while (token != NULL)
 	{
 		//printf("token: %s\n", token);
-		tokens[position] = token;
+		tokens[position] = (char*)malloc(sizeof(char) * (strlen(token) + 1));
+		if(tokens[position] == NULL){
+			perror("malloc err in splitLine()");
+			return NULL;
+		}
+		strcpy(tokens[position], token);
 		position++;
 
 		if (position > tknsNum - 1) {
@@ -189,6 +194,7 @@ char **splitLine(char *line)
 		return tokens;
 	}
     printf("end of splitLine! tokens:\n");
+	if(lineCpy != NULL)	free(lineCpy);
     printArgs(tokens);
 }
 //
@@ -200,4 +206,18 @@ void printArgs(char **args){
     }
     while(*args != NULL) printf("%s", *args++);
 
+}
+//
+//
+int freeArgs(char **args){
+	if(args == NULL){
+		return 1;
+	}
+	int s = 0, i;
+	s = argsCount(args);
+	for(i = 0; i < s; i++){
+		if(args[i] != NULL)	free(args[i]);
+	}
+	if(args != NULL)	free(args);
+	return 1;
 }

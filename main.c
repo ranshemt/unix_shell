@@ -14,18 +14,6 @@ int main(int argc, char **argv)
   //
   // Run command loop.
   shellLoop();
-  //
-  //free memory
-  int sTmp = argsCount(history), i;
-  for(i = 0; i< sTmp; i++){
-    if(history[i] != NULL) free(history[i]);
-  }
-  if(history != NULL) free (history);
-  if(myPids != NULL)  free(myPids);
-  sTmp = argsCount(myEnvs), i;
-  for(i = 0; i< sTmp; i++){
-    if(myEnvs[i] != NULL) free(myEnvs[i]);
-  }
-  if(myEnvs != NULL) free (myEnvs);
+  
   return 0;
 }
