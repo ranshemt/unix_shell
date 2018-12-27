@@ -6,9 +6,8 @@ void shellLoop()
 {
     char *line;     //allocated in readLine
     char **args;    //allocated in splitLine
-    int status, hisSize, sTmp, i;
+    int status, sTmp, i;
     char strTmp[2048];
-    hisSize = argsCount(history);
     do
     {
         printf("> ");
@@ -19,22 +18,6 @@ void shellLoop()
             fprintf(stderr, "no line input!\n");
             continue;
         }
-        printf("> > > > line = %s\n", line);
-        //
-        //save line in history
-        sTmp = argsCount(history);
-        printf("> > > > history size = %d\n", sTmp);
-        history[sTmp] = (char*)malloc(sizeof(char)*(strlen(line)+1));
-        printf("> > > > allocated memory in index %d of history : %p\n", sTmp, history[sTmp]);
-        if(history[sTmp] == NULL){
-            perror("malloc err in shellLoop()");
-            fprintf(stderr, "malloc err for history. %s won't be saved\n", line);
-            if(line != NULL) free(line);
-            continue;
-        }
-        strcpy(history[sTmp], line);
-        printf("> > > > after copy: %s\n", history[sTmp]);
-        history[sTmp + 1] = NULL;
         //
         //split line into args
         strcpy(strTmp, line);
@@ -44,12 +27,31 @@ void shellLoop()
             if(line != NULL) free(line);
             continue;
         }
+        //
+        sTmp = argsCount(history);
+        if(sTmp == 0 && strcmp(args[0], "!") == 0){
+            if(line != NULL) free(line);
+            continue;
+        }
+        //
+        //save line in history
+        history[sTmp] = (char*)malloc(sizeof(char)*(strlen(line)+1));
+        if(history[sTmp] == NULL){
+            perror("malloc err in shellLoop()");
+            fprintf(stderr, "malloc err for history. %s won't be saved\n", line);
+            if(line != NULL) free(line);
+            return;
+        }
+        strcpy(history[sTmp], line);
+        history[sTmp + 1] = NULL;
+        //
             // printf("> args: \n");
             // printArgs(args);
         //
-        if(strcmp("!", args[0]) == 0){
+        // ! run command by history
+        while(strcmp("!", args[0]) == 0){
             histNum = -1;
-            histNum = atoi(args[1]);
+            histNum = betterAtoi(args[1]);
             strcpy(strTmp, history[histNum]);
             args = splitLine(strTmp);
         }
@@ -57,7 +59,7 @@ void shellLoop()
         //run the command
         status = runCommand(args);
         if(status == -1){
-            fprintf(stderr, "certainy wrong input: %s", line);
+            fprintf(stderr, "probably wrong input: %s", line);
         }
         if(status == 0){
             fprintf(stderr, "runCommand() didn't work\n");
@@ -68,17 +70,8 @@ void shellLoop()
         if(args == NULL){
             continue;
         }
-        // sTmp = argsCount(args);
-        // for(i = 0; i < sTmp; i++){
-        //     if(args != NULL && args[i] != NULL){
-        //         free(args[i]);
-        //     }
-        // }
         if(args != NULL){
             free(args);
-        }
-        if(status == -99){
-            break;
         }
     } while (status);
 }
@@ -104,7 +97,6 @@ int runCommand(char **args)
         //all commands
         if (strcmp(args[0], commsCodes[i]) == 0){
             r = (*commsFuncs[i])(args);
-            //printf("matching command: %s\n", commsCodes[i]);
             //app commands
             if(r == 1 && isAppCommand(commsCodes[i]))
             r = appLaunch(args);
@@ -124,8 +116,6 @@ int runCommand(char **args)
 //called by runCommand to activate program
 int appLaunch(char **args)
 {
-        //printf("> appLaunch() called with args:\n");
-        //printArgs(args);
     //vars
     pid_t pid, wpid;
     int status, comm = -1, i, lenT, outFD, s;
@@ -186,6 +176,7 @@ int appLaunch(char **args)
         s = argsCount(args);
         outFD = open(args[s-1], O_WRONLY | O_CREAT | O_TRUNC,S_IRWXU);
     }
+    //
     //fork
     pid = fork();
     if (pid == 0)

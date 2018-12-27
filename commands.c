@@ -134,11 +134,10 @@ int tasks(char **args){
 
     for(i = 0; i < sizePids; i++){
         currPid = myPids[i];
-        printf("> > > > i = %d, pid = %d, pidsStrHistory[i] = %d\n", i, currPid, pidsStrHistory[i]);
         strcpy(histCpy, history[pidsStrHistory[i]]);
         argsTmp = splitLine(histCpy);
         //print
-        printf("> > > > %s:%d\n", argsTmp[1], currPid);
+        printf("> %s:%d\n", argsTmp[1], currPid);
         currPid = -1;
     }
     return 1;
@@ -153,7 +152,6 @@ int return_pid(char **args){
     tmpS = (char*) malloc(sizeof(char) * (len+1));
     //check
     strcpy(tmpS, args[1]);
-    printf("< < < < tmpS: %s\n", tmpS);
     int currPid = betterAtoi(tmpS);
     if(currPid == 0){
         printf("> ERR: no valid pid for args[1] = %s\n", args[1]);
@@ -222,7 +220,6 @@ int mySetEnv(char **args){
     strcpy(myEnvs[envsSize], key);
     //terminate myEnvs
     myEnvs[envsSize+1] = NULL;
-    //printf("myEnvs: %s\n", myEnvs[envsSize]);
     //set
     envReturn = setenv(key, val, 1);
     if(envReturn == -1){
@@ -262,7 +259,6 @@ int showHistory(char **args){
     return 1;
 }
 int runByHistory(char **args){
-    printf("runByHistory()\n");
     return 1;
 }
 int myExit(char **args){
