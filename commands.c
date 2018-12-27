@@ -280,5 +280,5 @@ int myExit(char **args){
     showHistory(NULL);
     printf("> THANK YOU\n");
     printf("> GOOD BYE:)\n");
-    return 1;
+    return Exit;
 }

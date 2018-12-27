@@ -58,6 +58,11 @@ void shellLoop()
         //
         //run the command
         status = runCommand(args);
+        if(status == Exit){
+            if(line != NULL)    free(line);
+            freeArgs(args);
+            break;
+        }
         if(status == errOk){
             fprintf(stderr, "runCommand(%s) didn't work\n", line);
         }
@@ -71,7 +76,6 @@ void shellLoop()
     } while (status != errBad);
     //
     //free memory
-    int sTmp = 0;
     if(myPids != NULL)  free(myPids);
     if(pidsStrHistory != NULL)  free(pidsStrHistory);
     freeArgs(myEnvs);
@@ -243,7 +247,6 @@ int appLaunch(char **args)
             sizePids++;
         }
     }
-    int s = 0;
     if(newOut != NULL) free(newOut);
     freeArgs(argv);
     return 1;

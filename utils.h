@@ -20,6 +20,7 @@
 #define histSize 128
 #define errOk 9
 #define errBad 10
+#define Exit -55
 //
 //methods
 int isAppCommand(const char *code);
